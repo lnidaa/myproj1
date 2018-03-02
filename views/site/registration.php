@@ -31,8 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'password')->passwordInput() ?>
 
 <?=
-$form->field($model, 'role')->checkbox([
+$form->field($model, 'id_role')->checkbox([
         'label' => 'I want to do common order',
+        'value'=>1,
         'labelOptions' => [
             'style' => 'padding-left:20px;'
         ],

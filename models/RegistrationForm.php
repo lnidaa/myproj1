@@ -16,7 +16,7 @@ class RegistrationForm extends Model
    public $surname;
     public $username;
     public $password;
-    public $role;
+    public $id_role;
 
     /**
      * @inheritdoc
@@ -49,6 +49,7 @@ class RegistrationForm extends Model
         $user->name = $this->name;
         $user->surname = $this->surname;
         $user->password=$this->password;
+        $user->id_role=$this->id_role;
       //  $user->generateAuthKey();
         return $user->save();
     }
