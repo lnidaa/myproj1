@@ -21,12 +21,22 @@ $config = [
                 'yii\web\JqueryAsset' => [
                     'sourcePath' => null,   // do not publish the bundle
                     'js' => [
-
+'js/func.js',
                     ]
                 ],
             ],
         ],
-        'baseUrl'=> '',
+        'assetManager'=>array(
+            'bundles' => array(
+                'yii\web\JqueryAsset' => array(
+                    'sourcePath' => null,
+                    'js' => array(
+                        '//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js',
+                    ),
+                ),
+            )
+        ),
+        'baseUrl'=> 'site\login.php',
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],

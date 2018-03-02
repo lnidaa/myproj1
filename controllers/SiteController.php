@@ -10,9 +10,13 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\RegistrationForm;
-use app\models\MakeOrderForm;
-use app\models\Order;
+use app\models\ItemForm;
+use app\models\OrderForm;
+use app\models\UserOrder;
 use app\models\HistoryOrder;
+use app\models\User;
+use yii\db\Query;
+use yii\helpers\Json;
 
 class SiteController extends Controller
 {
@@ -137,10 +141,10 @@ class SiteController extends Controller
         if (isset($_POST['RegistrationForm'])) {
             $model->attributes = Yii::$app->request->post('RegistrationForm');
 
-            if ($model->validate()&& $model->signup()) {
+            if ($model->validate() && $model->signup()) {
 
                 return $this->goHome();
-        }
+            }
         }
         return $this->render('registration', [
             'model' => $model,
@@ -149,20 +153,108 @@ class SiteController extends Controller
 
     public function actionOrder()
     {
-        $makeorderform = new MakeOrderForm();
-        $order=new Order();
-        return $this->render('order', [
-            'makeorderform' => $makeorderform,
-            'order'=>$order,
-        ]);
+
+        $userorder = new UserOrder();
+
+        if (isset($_POST['UserOrder'])) {
+            $userorder->attributes = Yii::$app->request->post('UserOrder');
+
+            if ($userorder->validate() && $userorder->insertOrder()) {
+                // return $this->goHome();
+                return $this->render('entry-confirm', [
+                    'userorder' => $userorder,
+                ]);
+            } else {
+                return $userorder->errors;
+            }
+
+
+        } else {
+
+            return $this->render('order_form', [
+                'userorder' => $userorder,
+            ]);
+        }
     }
 
     public function actionHistory()
     {
-        $model = new HistoryOrder();
+        $query = new Query;
+
+        $id_user = Yii::$app->user->identity->id_user;
+        $id_role = Yii::$app->user->identity->id_role;
+        if ($id_role == 1) {
+            $query->select([
+                    'uo.id_order',
+                    'uo.restaurant',
+                    'uo.date_order',
+                    'uo.total',
+                    'u.name',
+                    'u.surname']
+            )->from('user_order uo')
+                ->join('INNER JOIN', 'user u', 'u.id_user=uo.id_user')
+                ->orderBy('date_order desc');
+        } else {
+            $query->select([
+                    'id_order',
+                    'restaurant',
+                    'date_order',
+                    'total']
+            )->from('user_order')
+                ->where('id_user= ' . $id_user)
+                ->orderBy('date_order desc');
+        }
+        $command = $query->createCommand();
+        $historyorder = $command->queryAll();
+
+
+
         return $this->render('history', [
-            'model' => $model,
+            'historyorder' => $historyorder,
         ]);
+
     }
+    public function actionItems(){
+        //        if (Yii::$app->request->isAjax) {
+        //    return "sacasc";
+        //echo "HOHOHO";
+        //  if ($_POST['a']) {
+//                $a = $_POST['a'];
+//                $query_items->select([
+//                        'item_name',
+//                        'item_quantity',
+//                        'price',
+//                        'id_order']
+//                )->from('item_order')
+//                    ->where('id_order=' . $a);
+//                $command = $query_items->createCommand();
+//                $items = $command->queryAll();
+//
+//                return $this->render('history', [
+//                    'historyorder' => $historyorder,
+//                    'items' => $items
+//                ]);
+        // }
+        //   }
+        if(\Yii::$app->request->isAjax) {
+            $a=$_POST['a'];
+            $query_items = new Query;
+            $query_items->select([
+                        'item_name',
+                        'item_quantity',
+                        'price',
+                        'id_order']
+                )    ->from('item_order')
+                    ->where('id_order=' . $a);
+                $command = $query_items->createCommand();
+                $items = $command->queryAll();
+          return json_encode($items);
+
+        }
+        else{
+            return "Cry";
+        }
+    }
+
 
 }

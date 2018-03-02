@@ -1,6 +1,7 @@
 html,
 body {
     height: 100%;
+    color: #9994b4;
 }
 
 .wrap {
@@ -16,8 +17,8 @@ body {
 
 .footer {
     height: 60px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
+    background-color: #eaeff7;
+    border-top: 1px solid #eaeff7;
     padding-top: 20px;
 }
 
@@ -113,3 +114,43 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+#add_item{
+    background-color:#7dc7d2;
+    border: 0;
+}
+#delete_item{
+    background-color:red;
+    border: 0;
+}
+#make_order{
+    background-color:#7dc7d2;
+    border: 0;
+}
+#item{
+    color: #6395a0;
+    text-decoration: underline;
+}
+.menu{
+    background-color:#d7eae5;
+    border:0;
+    color:#d7eae5;
+}
+.item-order{
+   border:solid;
+    color:black;
+}
+.item_head{
+    color:#35838d;
+    background-color:#d7eae5;
+}
+.order_head{
+    color:#006a91;
+    background-color:#94c8d6;
+}
+td{
+    color:#6b96c1;
+}
+/*.menu-focus >.active{*/
+    /*background-color:red;*/
+    /*border:0;*/
+/*}*/
