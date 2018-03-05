@@ -35,7 +35,7 @@ class UserIdentity extends \yii\db\ActiveRecord
             [['name', 'surname', 'username', 'password'], 'required'],
             [['name', 'username', 'password'], 'string', 'max' => 20],
             [['surname'], 'string', 'max' => 50],
-            [['id_role'], 'string', 'max' => 4],
+            [['id_role'], 'number', 'max' => 4],
             [['auth_key', 'access_token'], 'string', 'max' => 32],
         ];
     }

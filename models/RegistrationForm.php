@@ -29,6 +29,7 @@ class RegistrationForm extends Model
             ['username', 'unique', 'targetClass' => '\app\models\User', 'message' => 'This username has already been taken.'],
             ['name', 'required'],
             ['surname', 'required'],
+            ['id_role', 'number'],
             ['username', 'string', 'min' => 2, 'max' => 20],
             ['password', 'required'],
             ['password', 'string', 'min' => 6],

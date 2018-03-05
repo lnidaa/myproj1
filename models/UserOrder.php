@@ -18,7 +18,7 @@ class UserOrder  extends \yii\db\ActiveRecord
     public $total;
     public $item_name;
     public $price;
-    public $item_quantity  = [];
+    public $item_quantity;
 
     public function rules()
     {
@@ -29,7 +29,8 @@ class UserOrder  extends \yii\db\ActiveRecord
             ['date_order', 'required'],
             ['item_name', 'trim'],
             ['item_name', 'required'],
-
+            ['total', 'trim'],
+            ['total', 'required'],
             ['item_quantity', 'trim'],
             ['item_quantity', 'required'],
      //       ['item_quantity', 'each', 'rule' => ['integer', 'min' => 0]],
@@ -55,6 +56,7 @@ class UserOrder  extends \yii\db\ActiveRecord
         $orderform->restaurant = $this->restaurant;
         $orderform->id_user= $id_user;
         $orderform->date_order = $this->date_order;
+        $orderform->total = $this->total;
         $orderform->save();
         $id_order = $orderform->getPrimaryKey();
         $length= count($this->item_name);

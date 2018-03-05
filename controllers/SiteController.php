@@ -157,6 +157,9 @@ class SiteController extends Controller
         $userorder = new UserOrder();
 
         if (isset($_POST['UserOrder'])) {
+//            echo "<pre>";
+//            var_dump($_POST['UserOrder']);
+//            echo "</pre>";
             $userorder->attributes = Yii::$app->request->post('UserOrder');
 
             if ($userorder->validate() && $userorder->insertOrder()) {
@@ -253,6 +256,12 @@ class SiteController extends Controller
         }
         else{
             return "Cry";
+        }
+    }
+    public function actionTotal(){
+        if(\Yii::$app->request->isAjax) {
+            $total=$_POST['total'];
+            return $total;
         }
     }
 

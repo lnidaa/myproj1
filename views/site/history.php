@@ -55,9 +55,11 @@ use yii\helpers\Html;
 //echo "</pre>";
 $script_show = <<< JS
     $(document).ready(function(){
-   $('.show_items').click(function(){
+   $('.show_items').click(function(e){
     var trClass = $(this).closest('tr').attr('class'); 
     var a= $('.'+trClass).find('#id_order').html();
+    if($(this).find('i').hasClass('glyphicon-chevron-down')){
+        $(this).find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
     // alert(a);
    // $('.table_item'+a).slideDown();
    $.ajax({
@@ -72,7 +74,7 @@ $script_show = <<< JS
       
       for (var item in data) {
         console.log(item);
-          html += '<tr>'+
+          html += '<tr class="a">'+
                         '<td></td>'+
                         '<td>'+data[item].item_name+'</td>'+
                         '<td>'+data[item].item_quantity+'</td>'+
@@ -81,11 +83,11 @@ $script_show = <<< JS
       }
       
       html = '<tr>'+
-            '<td colspan="5">'+
+            '<td colspan="5" class="a">'+
                 '<table class="table table_item" id="table_item'+a+'" >'+
                    '<thead class="item_head">'+
                     '<tr>'+
-                        '<th ><a class="hide_items" id="bla"><i class="glyphicon glyphicon-chevron-up"></i></a></th>'+
+                        '<th></th>'+
                         '<th>Item</th>'+
                         '<th>Quantity</th>'+
                         '<th>Price</th>'+
@@ -106,23 +108,28 @@ alert('Error!');
 }
    
 
-   })
+   })    
+    }else{
+        $('#table_item' + a).closest('tr').remove();
+        $(this).find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+    }
+    
     
    }); 
     });
 JS;
 $this->registerJs($script_show);
 $script_hide=<<<JS
-   $(document).ready(function(){
-      $('.hide_items').click(function(){  
-          console.log('sdvs');
-         // var tableId = $(this).closest('table').attr('id'); 
-        //  alert(tableId);
-         // $('#'+tableId).remove();
-        //  var a= $('.'+trClass).find('#id_order').html();
-    // $('.table_item'+a).slideUp();  
-      });
-   });
+   // $(document).ready(function(){
+   //    $('.show_items').on('click', function(e){
+   //      
+   //       // var tableId = $(this).closest('table').attr('id'); 
+   //       // // alert(tableId);
+   //       // $('#'+tableId).remove();
+   //       // var a= $('.'+trClass).find('#id_order').html();
+   //  $('.table_item'+a).slideUp();  
+   //    });
+   // });
 JS;
-$this->registerJs($script_hide);
+//$this->registerJs($script_hide);
 ?>

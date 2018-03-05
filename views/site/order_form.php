@@ -44,6 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($userorder, 'item_name[]')->textInput(['multiple'=>'multiple']) ?>
     <?= $form->field($userorder, 'item_quantity[]')->textInput(['type'=>'number', 'multiple'=>'multiple', 'min'=>0, 'placeholder'=>'0']) ?>
     <?= $form->field($userorder, 'price[]')->textInput(['type'=>'number', 'multiple'=>'multiple', 'min'=>0, 'placeholder'=>'0.00', 'step'=>"any"]) ?>
+
+
     <hr/>
     </div>
 </div>
@@ -55,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </button></br>
 
 </br>
-<?= $form->field($userorder, 'total')->textInput(['disabled' => 'disabled']) ?>
+<?= $form->field($userorder, 'total')->textInput() ?>
 <div class="form-group" >
         <div class="col-lg-offset-1 col-lg-11" >
             <?= Html::submitButton('I want to make order', ['class' => 'btn btn-primary', 'name' => 'order-button', 'id'=>'make_order']) ?>
@@ -69,6 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 $script = <<< JS
 $(document).ready(function(){
+    get_total();
     $('#add_item').click(function(e){
          e.preventDefault();
      var x= $('.wrapper').length+1;
@@ -78,8 +81,8 @@ $(document).ready(function(){
       var but= $(eq).find("#delete_item");
       $(but).data('data_id', x);
          eq.appendTo('#item_order').find('input').val('') ;
-       
-
+      get_total();
+// getData();
       })
       
   
@@ -92,33 +95,52 @@ $script_delete = <<< JS
 $(document).ready(function(){
     $('#delete_item').click(function(e){
          e.preventDefault();
-         event.target.parentNode.remove();
+        var divId=$(this).closest('div').attr('id');
+        $('div #'+divId).remove();
+        get_total();
+        // event.target.parentNode.remove();
    })
       
   
 });
 JS;
 $this->registerJs($script_delete);
+
 $script_total=<<< JS
-$(document).ready(function(){
-    // $( "input[name='UserOrder[price][]']" ).mouseout(function (){
-    //    var a= $( "input[name='UserOrder[price][]']" ).val();
-    //   alert (a); 
-    //   });
-    //  $( "input[name='UserOrder[price][]']" ).mouseout(function (){
-    //  var b= $( "input[name='UserOrder[item_quantity][]']" ).val();
-    //  alert(b);
-    //  });
-    function get_data(data){
+function get_total(){
+  var wrappers=$('#item_order').find('.wrapper');
+  var total=0;
+  for(var i = 0; i < wrappers.length; i++ ){
+      var a=$(wrappers[i]).find('#userorder-item_quantity').val();
+      var b=$(wrappers[i]).find('#userorder-price').val();
+      var subtotal=a*b;
+      total=total+subtotal;
+      total.toFixed(2);
+      
 
-    console.log(data.children())
+ };
+   $.ajax({
+   url: 'index.php?r=site/total',
+   dataType : "html",
+   type:'POST',
+   data: {total:total},
+   success:function(res){
+       $('#userorder-total').val(res);
+      }
+    });
 }
-get_data($('.item_order'))
 
-
-});
 JS;
 $this->registerJs($script_total);
+$script_changing=<<< JS
+$(document).ready(function(){
+   $('input').change(function(){
+       get_total();
+   })
+});
 
+
+JS;
+$this->registerJs($script_changing);
 ?>
 
