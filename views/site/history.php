@@ -11,11 +11,11 @@ use yii\helpers\Html;
     <thead class="order_head">
     <tr>
         <th></th>
-        <th>Date</th>
-        <th>Restaurant</th>
-        <th>Total</th>
+        <th class="col-lg-3">Date</th>
+        <th class="col-lg-3">Restaurant</th>
+        <th class="col-lg-3">Total</th>
         <?php if($id_role==1){?>
-            <th>User</th>
+            <th class="col-lg-3">User</th>
         <?php }?>
     </tr>
     </thead>
@@ -29,14 +29,14 @@ use yii\helpers\Html;
     // foreach ($historyorder as $order) {
     for($a=0;  $a<$count; $a++){
         ?>
-        <tr class="<?=$a?>" id="<?= $historyorder[$a]['id_order'] ?>">
-            <td class="history_td"><a class="show_items" id="bla"><i class="glyphicon glyphicon-chevron-down"></i></a></td>
-            <td hidden id="id_order"><?= $historyorder[$a]['id_order'] ?></td>
-            <td class=""><?= $historyorder[$a]['date_order'] ?></td>
-            <td><?= $historyorder[$a]['restaurant'] ?></td>
-            <td><?= $historyorder[$a]['total'] ?></td>
+        <tr class="<?=$a?>" id="<?= $historyorder[$a]['id_order'] ?>" style="background-color:#f7f6f6">
+            <td class="history_td "><a class="show_items" id="bla"><i class="glyphicon glyphicon-chevron-down"></i></a></td>
+            <td hidden id="id_order" ><?= $historyorder[$a]['id_order'] ?></td>
+            <td class="col-lg-3"><?= $historyorder[$a]['date_order'] ?></td>
+            <td class="col-lg-3"><?= $historyorder[$a]['restaurant'] ?></td>
+            <td class="col-lg-3"><?= $historyorder[$a]['total'] ?></td>
             <?php if($id_role==1){?>
-                <td><?= $historyorder[$a]['name'].' '.$historyorder[$a]['surname']?></td>
+                <td class="col-lg-3"><?= $historyorder[$a]['name'].' '.$historyorder[$a]['surname']?></td>
             <?php }?>
         </tr>
         <?php
@@ -74,11 +74,11 @@ $script_show = <<< JS
       
       for (var item in data) {
         console.log(item);
-          html += '<tr class="a">'+
+          html += '<tr class="a" style="background-color:#f8f0ef">'+
                         '<td></td>'+
-                        '<td>'+data[item].item_name+'</td>'+
-                        '<td>'+data[item].item_quantity+'</td>'+
-                        '<td>'+data[item].price+'</td>'+
+                        '<td class="col-lg-3" >'+data[item].item_name+'</td>'+
+                        '<td class="col-lg-3">'+data[item].item_quantity+'</td>'+
+                        '<td class="col-lg-3">'+data[item].price+'</td>'+
                     '</tr>';
       }
       
@@ -86,11 +86,11 @@ $script_show = <<< JS
             '<td colspan="5" class="a">'+
                 '<table class="table table_item" id="table_item'+a+'" >'+
                    '<thead class="item_head">'+
-                    '<tr>'+
-                        '<th></th>'+
-                        '<th>Item</th>'+
-                        '<th>Quantity</th>'+
-                        '<th>Price</th>'+
+                    '<tr >'+
+                        '<th ></th>'+
+                        '<th class="col-lg-3" >Item</th>'+
+                        '<th class="col-lg-3">Quantity</th>'+
+                        '<th class="col-lg-3">Price</th>'+
                     '</tr>'+
                     '</thead>'+
                     '<tbody>' + html + ' </tbody>'+

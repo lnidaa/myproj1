@@ -36,7 +36,7 @@ $config = [
                 ),
             )
         ),
-        'baseUrl'=> 'site\login.php',
+        'baseUrl'=> 'site/login.php',
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],

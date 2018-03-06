@@ -115,11 +115,11 @@ a.desc:after {
     outline: none;
 }
 #add_item{
-    background-color:#7dc7d2;
+   color:#7dc7d2;
     border: 0;
 }
 #delete_item{
-    background-color:red;
+  color:red;
     border: 0;
 }
 #make_order{
@@ -150,6 +150,7 @@ a.desc:after {
 td{
     color:#6b96c1;
 }
+
 /*.menu-focus >.active{*/
     /*background-color:red;*/
     /*border:0;*/

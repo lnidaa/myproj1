@@ -38,9 +38,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="form-horizontal" id="item_order">
     <div class="wrapper" id="1">
 
-    <button class="btn  col-md-offset-4 " data-id ="1" name="delete_item" id="delete_item"  title="Delete this item">
+    <a class="btn  col-md-offset-4 " data-id ="1" name="delete_item" id="delete_item"  title="Delete this item">
         <i class="glyphicon glyphicon-remove"></i>
-    </button></br>
+    </a></br>
     <?= $form->field($userorder, 'item_name[]')->textInput(['multiple'=>'multiple']) ?>
     <?= $form->field($userorder, 'item_quantity[]')->textInput(['type'=>'number', 'multiple'=>'multiple', 'min'=>0, 'placeholder'=>'0']) ?>
     <?= $form->field($userorder, 'price[]')->textInput(['type'=>'number', 'multiple'=>'multiple', 'min'=>0, 'placeholder'=>'0.00', 'step'=>"any"]) ?>
@@ -50,11 +50,11 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-  <button class="btn btn-success col-md-offset-4 add_item" name="add_item" id="add_item" title="Add one more item">
+  <a class="btn  col-md-offset-4 add_item" name="add_item" id="add_item" title="Add one more item">
 
         <i class="glyphicon glyphicon-plus"></i>
 
-    </button></br>
+    </a></br>
 
 </br>
 <?= $form->field($userorder, 'total')->textInput() ?>
@@ -74,6 +74,7 @@ $(document).ready(function(){
     get_total();
     $('#add_item').click(function(e){
          e.preventDefault();
+         
      var x= $('.wrapper').length+1;
      
       let eq = $('.wrapper').eq(0).clone(true); 
@@ -95,9 +96,13 @@ $script_delete = <<< JS
 $(document).ready(function(){
     $('#delete_item').click(function(e){
          e.preventDefault();
-        var divId=$(this).closest('div').attr('id');
+           var wrappers=$('#item_order').find('.wrapper');
+        if(wrappers.length>1)
+         var divId=$(this).closest('div').attr('id');
         $('div #'+divId).remove();
-        get_total();
+        get_total();    
+         
+       
         // event.target.parentNode.remove();
    })
       
