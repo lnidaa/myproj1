@@ -1,10 +1,14 @@
 <?php
 use yii\helpers\Html;
 ?>
-<h1 id="item">You have ordered:</h1>
+<h1 id="item">Information about your order:</h1>
 <?php
 $length= count($userorder->item_name);
 ?>
+<h3>Restaurant: <?=$userorder->restaurant?> </h3>
+<hr>
+<h3>Date: <?=$userorder->date_order?></h3>
+<hr>
 <table class="table">
     <thead>
     <tr>
@@ -38,26 +42,5 @@ for($i=0; $i<$length;$i++){
 <h2 id="item">Total:<?=$userorder->total?></h2>
 <?php
 
-//echo "<pre>";
-//var_dump($userorder);
-//echo "</pre>";
-//echo "<pre>";
-//var_dump($userorder->restaurant);
-//echo "</pre>";
-//echo "<pre>";
-//var_dump($userorder->item_name);
-//echo "</pre>";
-//echo "<pre>";
-//var_dump($userorder->item_quantity);
-//echo "</pre>";
-//echo "<pre>";
-//var_dump($userorder->price);
-//echo "</pre>";
-?>
 
-<!--<ul>-->
-<!--    <li><label>Restaurant</label>: --><?//= Html::encode($order->restaurant) ?><!--</li>-->
-<!--    <li><label>Name</label>: --><?//= Html::encode($makeorderform->name) ?><!--</li>-->
-<!--    <li><label>Quantity</label>: --><?//= Html::encode($makeorderform->quantity) ?><!--</li>-->
-<!--    <li><label>Price</label>: --><?//= Html::encode($makeorderform->price) ?><!--</li>-->
-<!--</ul>-->
+?>

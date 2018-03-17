@@ -28,6 +28,7 @@ AppAsset::register($this);
 
 <div class="wrap">
     <?php
+    $id_role = Yii::$app->user->identity->id_role;
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
@@ -46,11 +47,35 @@ AppAsset::register($this);
             ],
         ]);
     }
+//    if($id_role==1){
+//        echo Nav::widget([
+//            'options' => ['class' => 'navbar-nav navbar-right menu-focus '],
+//            'items' => [
+//                ['label' => 'Order', 'url' => ['/site/order']],
+//                ['label' => 'Orders for today', 'url' => ['/site/actual']],
+//                ['label' => 'History', 'url' => ['/site/history']],
+//           //   ['label' => 'Contact', 'url' => ['/site/contact']],
+//
+//
+//
+//            ],
+//        ]);
+//        echo '<li>'
+//            . Html::beginForm(['/site/logout'], 'post')
+//            . Html::submitButton(
+//                'Logout (' . Yii::$app->user->identity->username . ')',
+//                ['class' => 'btn btn-link logout']
+//            )
+//            . Html::endForm()
+//            . '</li>';
+//    }
     else{
+    if($id_role==1){
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-right menu-focus '],
             'items' => [
                 ['label' => 'Order', 'url' => ['/site/order']],
+                ['label' => 'Orders for today', 'url' => ['/site/actual']],
                 ['label' => 'History', 'url' => ['/site/history']],
              //   ['label' => 'Contact', 'url' => ['/site/contact']],
 
@@ -58,6 +83,21 @@ AppAsset::register($this);
 
             ],
         ]);
+    }
+        else{
+            echo Nav::widget([
+                'options' => ['class' => 'navbar-nav navbar-right menu-focus '],
+                'items' => [
+                    ['label' => 'Order', 'url' => ['/site/order']],
+                    ['label' => 'History', 'url' => ['/site/history']],
+
+                    //   ['label' => 'Contact', 'url' => ['/site/contact']],
+
+
+
+                ],
+            ]);
+        }
         echo '<li>'
             . Html::beginForm(['/site/logout'], 'post')
             . Html::submitButton(

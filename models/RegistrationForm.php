@@ -51,7 +51,6 @@ class RegistrationForm extends Model
         $user->surname = $this->surname;
         $user->password=$this->password;
         $user->id_role=$this->id_role;
-      //  $user->generateAuthKey();
         return $user->save();
     }
 

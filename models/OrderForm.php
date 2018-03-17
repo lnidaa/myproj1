@@ -26,4 +26,8 @@ class OrderForm  extends \yii\db\ActiveRecord
             ['date_order', 'required'],
         ];
     }
+    public function getItems()
+    {
+        return $this->hasMany(ItemForm::className(), ['id_order' => 'id_order']);
+    }
 }

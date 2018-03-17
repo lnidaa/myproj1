@@ -31,5 +31,9 @@ class ItemForm extends \yii\db\ActiveRecord
           //  ['price',  'each', 'rule' => ['double', 'min' => 0.00]],
         ];
     }
+    public function getOrders()
+    {
+        return $this->hasOne(OrderForm::className(), ['id_order' => 'id_order']);
+    }
 
 }

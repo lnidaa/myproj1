@@ -16,6 +16,7 @@ class UserOrder  extends \yii\db\ActiveRecord
     public $restaurant;
     public $date_order;
     public $total;
+    public $id_item;
     public $item_name;
     public $price;
     public $item_quantity;
@@ -23,6 +24,8 @@ class UserOrder  extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            ['id_order', 'trim'],
+            ['id_item', 'trim'],
             ['restaurant', 'trim'],
             ['restaurant', 'required'],
             ['restaurant', 'string'],
@@ -33,42 +36,65 @@ class UserOrder  extends \yii\db\ActiveRecord
             ['total', 'required'],
             ['item_quantity', 'trim'],
             ['item_quantity', 'required'],
-     //       ['item_quantity', 'each', 'rule' => ['integer', 'min' => 0]],
-      //      ['item_quantity', 'checkQuantity'],
             ['price', 'trim'],
             ['price', 'required'],
-       //     ['item_quantity', 'each', 'rule' => ['double', 'min' => 0.00]],
-           ];
+
+        ];
     }
-//public function checkQuantity($attribute){
-//        foreach($this->item_quantity as $quantity){
-//            if($quantity<0){
-//                $this->addError('item_quantity ', "quantity shouldn`t be less 0");
-//            }
-//        }
-//}
+
     public function insertOrder()
     {
-
-
         $orderform = new OrderForm();
-        $id_user=Yii::$app->user->identity->id_user;
+        $id_user = Yii::$app->user->identity->id_user;
         $orderform->restaurant = $this->restaurant;
-        $orderform->id_user= $id_user;
+        $orderform->id_user = $id_user;
         $orderform->date_order = $this->date_order;
         $orderform->total = $this->total;
         $orderform->save();
         $id_order = $orderform->getPrimaryKey();
-        $length= count($this->item_name);
-        for($i=0; $i<$length;$i++){
+        $length = count($this->item_name);
+        for ($i = 0; $i < $length; $i++) {
             $itemform = new ItemForm();
-            $itemform->id_order=$id_order;
-            $itemform->item_name=$this->item_name[$i];
-            $itemform->item_quantity=$this->item_quantity[$i];
-            $itemform->price=$this->price[$i];
+            $itemform->id_order = $id_order;
+            $itemform->item_name = $this->item_name[$i];
+            $itemform->item_quantity = $this->item_quantity[$i];
+            $itemform->price = $this->price[$i];
             $itemform->save();
         }
         return $itemform;
 
     }
+
+    public function updateOrder()
+    {
+        $orderform = OrderForm::find()->where(['id_order' => $this->id_order])->one();
+        $orderform->restaurant = $this->restaurant;
+        $orderform->date_order = $this->date_order;
+        $orderform->total = $this->total;
+        $orderform->update();
+        $length = count($this->item_name);
+        $id_order = $this->id_order;
+        $itemform = ItemForm::find()->where(['id_order' => $this->id_order])->all();
+    foreach ($itemform as $item) {
+        for($i=0;$i<$length;$i++)
+                if (isset($this->id_item[$i])) {
+                    $item->item_name = $this->item_name[$i];
+                    $item->item_quantity = $this->item_quantity[$i];
+                    $item->price = $this->price[$i];
+                    $item->update();
+                }
+                else {
+
+                    $itemform = new ItemForm();
+                    $itemform->id_order = $id_order;
+                    $itemform->item_name = $this->item_name[$i];
+                    $itemform->item_quantity = $this->item_quantity[$i];
+                    $itemform->price = $this->price[$i];
+                    $itemform->save();
+                }
+            }
+
+        return $itemform;
+    }
+
 }

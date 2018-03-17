@@ -157,9 +157,7 @@ class SiteController extends Controller
         $userorder = new UserOrder();
 
         if (isset($_POST['UserOrder'])) {
-//            echo "<pre>";
-//            var_dump($_POST['UserOrder']);
-//            echo "</pre>";
+
             $userorder->attributes = Yii::$app->request->post('UserOrder');
 
             if ($userorder->validate() && $userorder->insertOrder()) {
@@ -180,69 +178,94 @@ class SiteController extends Controller
         }
     }
 
-    public function actionHistory()
+    public function actionHistory($choose=1)
     {
         $query = new Query;
-
+        $query_user= new Query;
+        $query_user->select(['id_user', 'name','surname'])
+            ->from('user');
+        $command = $query_user->createCommand();
+        $users = $command->queryAll();
         $id_user = Yii::$app->user->identity->id_user;
         $id_role = Yii::$app->user->identity->id_role;
-        if ($id_role == 1) {
+        //$choose=$this->actionChoose();
+        if ($id_role == 1 && $choose==1) {
             $query->select([
-                    'uo.id_order',
-                    'uo.restaurant',
-                    'uo.date_order',
-                    'uo.total',
-                    'u.name',
-                    'u.surname']
-            )->from('user_order uo')
-                ->join('INNER JOIN', 'user u', 'u.id_user=uo.id_user')
-                ->orderBy('date_order desc');
-        } else {
-            $query->select([
-                    'id_order',
-                    'restaurant',
-                    'date_order',
-                    'total']
+                    'user_order.id_order',
+                    'user_order.restaurant',
+                    'user_order.date_order',
+                    'user_order.total',
+                    'user.id_user',
+                    'user.name',
+                    'user.surname']
             )->from('user_order')
-                ->where('id_user= ' . $id_user)
+                ->join('INNER JOIN', 'user', 'user.id_user = user_order.id_user')
+                ->orderBy('date_order desc');
+        } else{
+            $query->select([
+                    'user_order.id_order',
+                    'user_order.restaurant',
+                    'user_order.date_order',
+                    'user_order.total',
+                    'user.id_user',
+                    'user.name',
+                    'user.surname']
+            )->from('user_order')
+                ->join('INNER JOIN', 'user', 'user.id_user = user_order.id_user')
+                ->where('user_order.id_user= ' . $id_user)
                 ->orderBy('date_order desc');
         }
         $command = $query->createCommand();
         $historyorder = $command->queryAll();
-
-
-
         return $this->render('history', [
             'historyorder' => $historyorder,
+            'users' => $users,
         ]);
 
     }
+    public function actionChoose(){
+        if(\Yii::$app->request->isAjax) {
+            $choose=$_POST['choose'];
+
+            $query = new Query;
+
+            $id_user = Yii::$app->user->identity->id_user;
+            $id_role = Yii::$app->user->identity->id_role;
+            if ($id_role == 1 && $choose==1) {
+                $query->select([
+                        'user_order.id_order',
+                        'user_order.restaurant',
+                        'user_order.date_order',
+                        'user_order.total',
+                        'user.name',
+                        'user.surname']
+                )->from('user_order')
+                    ->join('INNER JOIN', 'user', 'user.id_user = user_order.id_user')
+                    ->orderBy('date_order desc');
+            } else{
+                $query->select([
+                        'user_order.id_order',
+                        'user_order.restaurant',
+                        'user_order.date_order',
+                        'user_order.total',
+                        'user.name',
+                        'user.surname']
+                )->from('user_order')
+                    ->join('INNER JOIN', 'user', 'user.id_user = user_order.id_user')
+                    ->where('user_order.id_user= ' . $id_user)
+                    ->orderBy('date_order desc');
+            }
+            $command = $query->createCommand();
+            $orderstory = $command->queryAll();
+            return json_encode($orderstory);
+        }
+    }
     public function actionItems(){
-        //        if (Yii::$app->request->isAjax) {
-        //    return "sacasc";
-        //echo "HOHOHO";
-        //  if ($_POST['a']) {
-//                $a = $_POST['a'];
-//                $query_items->select([
-//                        'item_name',
-//                        'item_quantity',
-//                        'price',
-//                        'id_order']
-//                )->from('item_order')
-//                    ->where('id_order=' . $a);
-//                $command = $query_items->createCommand();
-//                $items = $command->queryAll();
-//
-//                return $this->render('history', [
-//                    'historyorder' => $historyorder,
-//                    'items' => $items
-//                ]);
-        // }
-        //   }
         if(\Yii::$app->request->isAjax) {
             $a=$_POST['a'];
             $query_items = new Query;
             $query_items->select([
+                'id_order',
                         'item_name',
                         'item_quantity',
                         'price',
@@ -264,6 +287,111 @@ class SiteController extends Controller
             return $total;
         }
     }
+    public function actionActual()
+    {
+        $today = date("Y-m-d");
+        $query = new Query;
+        $query->select([
+                'user_order.id_order',
+                'user_order.restaurant',
+                'user_order.date_order',
+                'item_order.id_item',
+                'item_order.item_name',
+                'item_order.item_quantity',
+                'item_order.price',
+                'user.name',
+                'user.surname']
+        )->from('user_order')
+            ->join('INNER JOIN', 'user', 'user.id_user = user_order.id_user')
+            ->join('INNER JOIN', 'item_order', 'user_order.id_order = item_order.id_order')
+           ->where('date_order="'.$today.'"' );
+        $command = $query->createCommand();
+        $actual_orders = $command->queryAll();
+        return $this->render('actual', [
+                'actual_orders' => $actual_orders,
+            ]);
+    }
+    public function actionSearch(){
+        if(\Yii::$app->request->isAjax) {
+            $id_user=$_POST['id_user'];
+            $date_order=$_POST['date_order'];
+            $restaurant=$_POST['restaurant'];
+                $query_order = new Query;
+                if($id_user=="all"){
+                    $query_order->select([
+                            'user_order.id_order',
+                            'user_order.restaurant',
+                            'user_order.date_order',
+                            'user_order.total',
+                            'user.name',
+                            'user.surname']
+                    )->from('user_order')
+                        ->join('INNER JOIN', 'user', 'user.id_user = user_order.id_user')
+                        ->where(['like' ,'user_order.restaurant', $restaurant] )
+                        ->andWhere(['like' ,'user_order.date_order',$date_order] )
+                        ->orderBy('date_order desc');
+                }
+                else{
+                    $query_order->select([
+                            'user_order.id_order',
+                            'user_order.restaurant',
+                            'user_order.date_order',
+                            'user_order.total',
+                            'user.name',
+                            'user.surname']
+                    )->from('user_order')
+                        ->join('INNER JOIN', 'user', 'user.id_user = user_order.id_user')
+                        ->where(['like' ,'user_order.restaurant',$restaurant] )
+                        ->andWhere(['like' ,'user_order.date_order',$date_order] )
+                        ->andWhere(['like' ,'user.id_user',$id_user])
+                        ->orderBy('date_order desc');
+                }
+            }
+            $command = $query_order->createCommand();
+            $user_orders = $command->queryAll();
+            return json_encode($user_orders);
 
+        }
+        public function actionEdit($id){
+            $userorder= new UserOrder();
+            if (isset($_POST['UserOrder'])) {
+                $userorder->attributes = Yii::$app->request->post('UserOrder');
+
+                if ($userorder->validate() && $userorder->updateOrder()) {
+                    return $this->render('entry-confirm', [
+                        'userorder' => $userorder,
+                    ]);
+                } else {
+                    return $userorder->errors;
+                }
+
+
+            }
+            else{
+                $query= new Query();
+                $query->select([
+                    'user_order.id_order',
+                    'user_order.restaurant',
+                    'user_order.date_order',
+                    'item_order.id_item',
+                    'item_order.item_name',
+                    'item_order.item_quantity',
+                    'item_order.price',
+                    'user_order.total'
+                ])
+                    ->from('user_order')
+                    ->leftJoin('item_order','item_order.id_order=user_order.id_order')
+                    ->where('user_order.id_order="'.$id.'"')
+                    ->all();
+                $command = $query->createCommand();
+                $order_information = $command->queryAll();
+                return $this->render('edit_order', [
+                    'order_information'=>$order_information,
+                    'userorder'=>$userorder,
+                ]);
+            }
+
+
+        }
 
 }

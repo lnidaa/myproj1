@@ -1,15 +1,44 @@
 <?php
 
 use yii\helpers\Html;
-
+use yii\helpers\Url;
 ?>
 <?php $id_role = Yii::$app->user->identity->id_role; ?>
+<?php $id_user = Yii::$app->user->identity->id_user; ?>
 <head>
     <?=Html::csrfMetaTags()?>
 </head>
+<?php if($id_role==1){?>
+    <hr/>
+    <form id="radio_choose">
+    <label class="radio-inline"><input type="radio" name="order" value="1" checked>All orders </label>
+    <label class="radio-inline"><input type="radio" name="order" value="2"> My orders</label><br/>
+    </form>
+    <hr/>
+    <form id="search_form" class="form-inline">
+        <select id="select_user" class="form-control col-lg-3">
+            <option id="all" selected>All users</option>
+<?php foreach ($users as $user){?>
+    <option id="<?=$user['id_user']?>"><?=$user['surname'].' '.$user['name']?></option>
+
+            <?php }?>
+        </select> &nbsp;
+        <?= kartik\date\DatePicker::widget(['name' => 'date', 'pluginOptions' => [
+            'format' => 'yyyy-mm-dd',
+            'todayHighlight' => true
+        ], 'id'=>'date_order']) ?>
+        &nbsp;
+        <div class="form-group">
+           <input type="" class="form-control" id="restaurant" placeholder="Restaurant:">
+        </div>
+    </form>
+    <br/>
+<?php }?>
+</br>
 <table class="table" id="table_order">
     <thead class="order_head">
     <tr>
+        <th></th>
         <th></th>
         <th class="col-lg-3">Date</th>
         <th class="col-lg-3">Restaurant</th>
@@ -22,21 +51,21 @@ use yii\helpers\Html;
     <tbody>
 
     <?php
-//    echo "<pre>";
-//    var_dump($items);
-//    echo "</pre>";
     $count=count($historyorder);
-    // foreach ($historyorder as $order) {
     for($a=0;  $a<$count; $a++){
         ?>
         <tr class="<?=$a?>" id="<?= $historyorder[$a]['id_order'] ?>" style="background-color:#f7f6f6">
-            <td class="history_td "><a class="show_items" id="bla"><i class="glyphicon glyphicon-chevron-down"></i></a></td>
+<!--            --><?php //echo "<pre>";
+//            var_dump($historyorder[$a]['id_user']);
+//            echo "</pre>";?>
+            <td ><a href="<?php echo Url::to(['site/edit', 'id' => $historyorder[$a]['id_order']]); ?>" title="Edit order" id="edit_order"><i class="glyphicon glyphicon-pencil"></i></a></td>
+           <td class="history_td "><a  class="show_items" title="Show items" id="bla"><i class="glyphicon glyphicon-chevron-down"></i></a></td>
             <td hidden id="id_order" ><?= $historyorder[$a]['id_order'] ?></td>
             <td class="col-lg-3"><?= $historyorder[$a]['date_order'] ?></td>
             <td class="col-lg-3"><?= $historyorder[$a]['restaurant'] ?></td>
             <td class="col-lg-3"><?= $historyorder[$a]['total'] ?></td>
             <?php if($id_role==1){?>
-                <td class="col-lg-3"><?= $historyorder[$a]['name'].' '.$historyorder[$a]['surname']?></td>
+                <td class="col-lg-3"><?= $historyorder[$a]['surname'].' '.$historyorder[$a]['name']?></td>
             <?php }?>
         </tr>
         <?php
@@ -50,18 +79,19 @@ use yii\helpers\Html;
 
 
 <?php
-//echo "<pre>";
-//var_dump($items);
-//echo "</pre>";
 $script_show = <<< JS
-    $(document).ready(function(){
-   $('.show_items').click(function(e){
-    var trClass = $(this).closest('tr').attr('class'); 
+   $(document).ready(function(){
+     $('#table_order').on('click', '.show_items', function(e){
+
+   console.log("scscas");
+    console.log (this);
+    var trClass = $(this).closest('tr').attr('class');
+    var trId = $(this).closest('tr').attr('id');
     var a= $('.'+trClass).find('#id_order').html();
     if($(this).find('i').hasClass('glyphicon-chevron-down')){
-        $(this).find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-    // alert(a);
-   // $('.table_item'+a).slideDown();
+         
+     $(this).find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+
    $.ajax({
    url: 'index.php?r=site/items',
    dataType : "json",
@@ -70,12 +100,54 @@ $script_show = <<< JS
    success:function(data){
       console.log(data);
       if (!$("#table_item"+a).length){
-      var html = '';
+      htmlBlock(data,a);
+      }
+   },
+   error: function(){
+alert('Error!');
+}
+   
+
+   })    
+    }else{
+      $('#table_item' + a).closest('tr').remove();
+      $(this).find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+    }
+    
+    
+   }); 
+    });
+JS;
+$this->registerJs($script_show);
+$script_sort = <<< JS
+$(document).ready(function(){
+     $('#radio_choose').click(function(){
+        var choose= $('input[name=order]:checked').val() ;
+        $.ajax({
+   url: 'index.php?r=site/choose',
+   dataType : "json",
+   type:'POST',
+   data: {choose:choose},
+   success:function(data){
+       htmlBlockOrders(data);
+   }
+     });
+});
+     });
+    
+
+JS;
+$this->registerJs($script_sort);
+$script_function_html=<<<JS
+    function htmlBlock(data,a){
+        var html = '';
       
       for (var item in data) {
         console.log(item);
-          html += '<tr class="a" style="background-color:#f8f0ef">'+
+          html += '<tr  id="'+a+'" style="background-color:#f8f0ef">'+
                         '<td></td>'+
+                        '<td></td>'+
+                           '<td></td>'+
                         '<td class="col-lg-3" >'+data[item].item_name+'</td>'+
                         '<td class="col-lg-3">'+data[item].item_quantity+'</td>'+
                         '<td class="col-lg-3">'+data[item].price+'</td>'+
@@ -88,9 +160,11 @@ $script_show = <<< JS
                    '<thead class="item_head">'+
                     '<tr >'+
                         '<th ></th>'+
-                        '<th class="col-lg-3" >Item</th>'+
-                        '<th class="col-lg-3">Quantity</th>'+
-                        '<th class="col-lg-3">Price</th>'+
+                         '<th></th>'+
+                          '<th></th>'+
+                        '<th class="col-lg-4" >Item</th>'+
+                        '<th class="col-lg-4">Quantity</th>'+
+                        '<th class="col-lg-4">Price</th>'+
                     '</tr>'+
                     '</thead>'+
                     '<tbody>' + html + ' </tbody>'+
@@ -100,36 +174,61 @@ $script_show = <<< JS
         '</tr>';
       
       $('#'+a).after(html);
-      }
-     // alert(data);
-   },
-   error: function(){
-alert('Error!');
-}
-   
-
-   })    
-    }else{
-        $('#table_item' + a).closest('tr').remove();
-        $(this).find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
     }
+
+
+JS;
+$this->registerJS($script_function_html);
+$script_function_order=<<<JS
+function htmlBlockOrders(data){
+    $('#table_order tbody>tr').remove();
+     var html = '';
+     for (var item in data) {
+      html += '<tr class="'+item+'" id="'+data[item].id_order+'" style="background-color:#f7f6f6">'+
+                        '<td ><a class="link_edit" title="Edit order"><i class="glyphicon glyphicon-pencil"></i></a></td>'+
+                        '<td class="history_td "><a class="show_items" id="bla"><i class="glyphicon glyphicon-chevron-down"></i></a></td>'+
+                         '<td hidden id="id_order" >'+data[item].id_order+'</td>'+
+                        '<td class="col-lg-3" >'+data[item].date_order+'</td>'+
+                        '<td class="col-lg-3">'+data[item].restaurant+'</td>'+
+                        '<td class="col-lg-3">'+data[item].total+'</td>'+
+                        '<td class="col-lg-3">'+data[item].name+ ' '+data[item].surname+'</td>'+
+                    '</tr>';   
+     }
     
-    
-   }); 
+      $('#table_order tbody').html(html);
+}
+JS;
+$this->registerJS($script_function_order);
+$script_search=<<<JS
+$(document).ready(function(){
+    $('#search_form').change(function(){
+          var id_user=$('#select_user option:selected').attr('id');
+          var date_order= $('#date_order').val();
+          var restaurant= $('#restaurant').val();
+        $.ajax({
+   url: 'index.php?r=site/search',
+   dataType : "json",
+   type:'POST',
+   data: {id_user:id_user,
+       date_order:date_order,
+       restaurant:restaurant},
+   success:function(data){
+     htmlBlockOrders(data);
+   }
+   });
+});
     });
 JS;
-$this->registerJs($script_show);
-$script_hide=<<<JS
-   // $(document).ready(function(){
-   //    $('.show_items').on('click', function(e){
-   //      
-   //       // var tableId = $(this).closest('table').attr('id'); 
-   //       // // alert(tableId);
-   //       // $('#'+tableId).remove();
-   //       // var a= $('.'+trClass).find('#id_order').html();
-   //  $('.table_item'+a).slideUp();  
-   //    });
-   // });
+$this->registerJS($script_search);
+$script_edit=<<<JS
+$(document).ready(function(){
+    $('#table_order').on('click', '.link_edit', function(e){
+        var id=$(this).closest('tr').attr('id');
+        
+      var url = 'index.php?r=site%2Fedit&id='+id+'';
+$(location).attr('href',url);
+});
+    });
 JS;
-//$this->registerJs($script_hide);
+$this->registerJS($script_edit);
 ?>
